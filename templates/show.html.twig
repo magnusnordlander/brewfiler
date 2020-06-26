@@ -1,15 +1,31 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
+    <p><a href="{{ path('list_brews') }}">&laquo; Back</a></p>
+
     <figure class="highcharts-figure">
         <div id="container"></div>
-        <p class="highcharts-description">
-            This demo visualizes a data set with irregular time intervals.
-            Highcharts comes with sophisticated functionality for dealing
-            with time data, including support for different time zones and
-            irregular intervals.
-        </p>
     </figure>
+
+    {{ form(form) }}
+
+    <dl>
+        <dt>Date and Time</dt>
+        <dd> {{ brew.startTime|date('Y-m-d H:i', 'Europe/Stockholm') }}</dd>
+        <dt>Total brew time</dt>
+        <dd>{{ brew.totalBrewTime|round(1) }} s</dd>
+        <dt>Drip time</dt>
+        <dd>{{ brew.dripTime|round(1) }} s</dd>
+        <dt>Drip flow</dt>
+        <dd>{{ brew.dripFlow|round(2) }} g/s</dd>
+        <dt>Post stop flow</dt>
+        <dd>{{ brew.postStopFlow|round(2) }} g</dd>
+        <dt>Target ratio</dt>
+        <dd>{% if brew.targetRatioDenominator %}1:{{ brew.targetRatioDenominator|round(2) }}{% else %}N/A{% endif %}</dd>
+        <dt>Brewed ratio</dt>
+        <dd>{% if brew.finalRatioDenominator %}1:{{ brew.finalRatioDenominator|round(2) }}{% else %}N/A{% endif %}</dd>
+
+    </dl>
 
     <script>
         Highcharts.chart('container', {
@@ -25,9 +41,14 @@
                     text: 'Time'
                 },
                 plotBands: [{
-                    from: new Date({{ ((meta.start_time + meta.preinfusion_time) * 1000)|round }}),
-                    to: new Date({{ ((meta.start_time + meta.preinfusion_time + meta.dwell_time) * 1000)|round }}),
+                    from: new Date({{ (brew.absolutePreinfusionTime|date('U.u') * 1000)|round }}),
+                    to: new Date({{ (brew.absoluteDwellTime|date('U.u') * 1000)|round }}),
                     color: '#6CF'
+                }],
+                plotLines: [{
+                    color: '#FF0000', // Red
+                    width: 2,
+                    value: new Date({{ (brew.stopTime|date('U.u' )* 1000)|round }}) // Position, you'll have to translate this to the values on your x axis
                 }]
             },
             yAxis: [{
@@ -55,29 +76,47 @@
                     enabled: false
                 },
                 data: [
-                    {% for datapoint in data %}
+                    {% for datapoint in brew.datapoints %}
                     {
-                        x: new Date({{ (datapoint.Time * 1000)|round }}),
-                        y: {{ datapoint.Weight }},
+                        x: new Date({{ (datapoint.timestamp|date('U.u') * 1000)|round }}),
+                        y: {{ datapoint.weight }},
                     },
                     {% endfor %}
                 ]
             },
         {
-            name: "Temperature",
+            name: "Boiler Temperature",
                 yAxis: 1,
             marker: {
                 enabled: false
             },
             data: [
-            {% for datapoint in data %}
+            {% for datapoint in brew.datapoints %}
                 {
-                    x: new Date({{ (datapoint.Time * 1000)|round }}),
-                    y: {{ datapoint.Temperature }},
+                    x: new Date({{ (datapoint.timestamp|date('U.u') * 1000)|round }}),
+                    y: {{ datapoint.boilerTemperature|round(1) }},
                 },
             {% endfor %}
-        ]
-        }],
+            ]
+        },
+                {% if brew.hasGroupTemperature %}
+                {
+                    name: "Group Temperature",
+                    yAxis: 1,
+                    marker: {
+                        enabled: false
+                    },
+                    data: [
+                        {% for datapoint in brew.datapoints %}
+                        {
+                            x: new Date({{ (datapoint.timestamp|date('U.u') * 1000)|round }}),
+                            y: {{ datapoint.groupTemperature|round(1) }},
+                        },
+                        {% endfor %}
+                    ]
+                },
+                {% endif %}
+        ],
 
             responsive: {
                 rules: [{

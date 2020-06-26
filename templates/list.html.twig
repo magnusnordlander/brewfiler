@@ -1,0 +1,12 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <h1>Brews</h1>
+
+    <ol>
+        {% for brew in brews %}
+            <li><a href="{{ path('show_brew', {'id': brew.id}) }}">{{ brew.name }}</a></li>
+        {% endfor %}
+
+    </ol>
+{% endblock %}
