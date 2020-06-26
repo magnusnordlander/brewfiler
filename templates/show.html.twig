@@ -1,0 +1,100 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <figure class="highcharts-figure">
+        <div id="container"></div>
+        <p class="highcharts-description">
+            This demo visualizes a data set with irregular time intervals.
+            Highcharts comes with sophisticated functionality for dealing
+            with time data, including support for different time zones and
+            irregular intervals.
+        </p>
+    </figure>
+
+    <script>
+        Highcharts.chart('container', {
+            chart: {
+                type: 'spline'
+            },
+            title: {
+                text: 'Brew'
+            },
+            xAxis: {
+                type: 'datetime',
+                title: {
+                    text: 'Time'
+                },
+                plotBands: [{
+                    from: new Date({{ ((meta.start_time + meta.preinfusion_time) * 1000)|round }}),
+                    to: new Date({{ ((meta.start_time + meta.preinfusion_time + meta.dwell_time) * 1000)|round }}),
+                    color: '#6CF'
+                }]
+            },
+            yAxis: [{
+                title: {
+                    text: 'Brew weight'
+                },
+                min: 0
+            },{
+                title: {
+                    text: 'Temperature'
+                },
+                min: 90
+            }
+            ],
+
+            colors: ['#39F', '#06C', '#036', '#000'],
+
+            // Define the data points. All series have a dummy year
+            // of 1970/71 in order to be compared on the same x axis. Note
+            // that in JavaScript, months start at 0 for January, 1 for February etc.
+            series: [{
+                name: "Weight",
+                yAxis: 0,
+                marker: {
+                    enabled: false
+                },
+                data: [
+                    {% for datapoint in data %}
+                    {
+                        x: new Date({{ (datapoint.Time * 1000)|round }}),
+                        y: {{ datapoint.Weight }},
+                    },
+                    {% endfor %}
+                ]
+            },
+        {
+            name: "Temperature",
+                yAxis: 1,
+            marker: {
+                enabled: false
+            },
+            data: [
+            {% for datapoint in data %}
+                {
+                    x: new Date({{ (datapoint.Time * 1000)|round }}),
+                    y: {{ datapoint.Temperature }},
+                },
+            {% endfor %}
+        ]
+        }],
+
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        plotOptions: {
+                            series: {
+                                marker: {
+                                    radius: 0.5
+                                }
+                            }
+                        }
+                    }
+                }]
+            }
+        });
+    </script>
+{% endblock %}
