@@ -16,10 +16,10 @@ class BrewMetaType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('coffee', TextType::class)
-            ->add('grindSize', IntegerType::class)
-            ->add('dose', NumberType::class)
-            ->add('tastingNotes', TextareaType::class)
+            ->add('coffee', TextType::class, ['required' => false])
+            ->add('grindSize', IntegerType::class, ['required' => false])
+            ->add('dose', NumberType::class, ['required' => false])
+            ->add('tastingNotes', TextareaType::class, ['required' => false])
             ->add('save', SubmitType::class)
         ;
     }

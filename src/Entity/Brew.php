@@ -244,15 +244,32 @@ class Brew
         return PythonDateParser::createDateTimeImmutable($this->meta['stop_time']);
     }
 
-    public function getAbsolutePreinfusionTime(): \DateTimeInterface
+    public function getPreinfusionUsed(): bool
     {
+        return $this->meta['preinfusion'];
+    }
+
+    public function getAbsolutePreinfusionTime(): ?\DateTimeInterface
+    {
+        if (!$this->getPreinfusionUsed()) {
+            return null;
+        }
+
         $startTime = $this->getStartTime();
         return $startTime->modify('+'.($this->meta['preinfusion_time']*1000).' ms');
     }
 
-    public function getAbsoluteDwellTime(): \DateTimeInterface
+    public function getAbsoluteDwellTime(): ?\DateTimeInterface
     {
+        if (!$this->getPreinfusionUsed()) {
+            return null;
+        }
+
         $preinfusionTime = $this->getAbsolutePreinfusionTime();
+        if (!$preinfusionTime) {
+            return null;
+        }
+
         return $preinfusionTime->modify('+'.($this->meta['dwell_time']*1000).' ms');
     }
 

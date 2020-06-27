@@ -40,11 +40,13 @@
                 title: {
                     text: 'Time'
                 },
+        {% if brew.preinfusionUsed %}
                 plotBands: [{
                     from: new Date({{ (brew.absolutePreinfusionTime|date('U.u') * 1000)|round }}),
                     to: new Date({{ (brew.absoluteDwellTime|date('U.u') * 1000)|round }}),
                     color: '#6CF'
                 }],
+        {% endif %}
                 plotLines: [{
                     color: '#FF0000', // Red
                     width: 2,
