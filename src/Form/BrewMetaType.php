@@ -20,6 +20,7 @@ class BrewMetaType extends AbstractType
             ->add('grindSize', IntegerType::class, ['required' => false])
             ->add('dose', NumberType::class, ['required' => false])
             ->add('tastingNotes', TextareaType::class, ['required' => false])
+            ->add('rating', IntegerType::class, ['required' => false])
             ->add('save', SubmitType::class)
         ;
     }

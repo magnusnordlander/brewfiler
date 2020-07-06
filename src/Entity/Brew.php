@@ -52,11 +52,14 @@ class Brew
 
     public function getName(): string
     {
-        $name = $this->getStartTime()->format('Y-m-d H:i');
+        $startTime = $this->getStartTime()->format('Y-m-d H:i');
+
+        $name = sprintf("%s (%s sec)", $startTime, round($this->getTotalBrewTime()));
 
         if ($this->getCoffee()) {
             $name .= ": ".$this->getCoffee();
         }
+
 
         return $name;
     }
@@ -104,6 +107,16 @@ class Brew
     public function setTastingNotes(?string $tastingNotes)
     {
         $this->meta['tasting_notes'] = $tastingNotes;
+    }
+
+    public function setRating(?int $rating)
+    {
+        $this->meta['rating'] = $rating;
+    }
+
+    public function getRating(): ?int
+    {
+        return $this->meta['rating'] ?? null;
     }
 
     public function getTotalBrewTime(): float
