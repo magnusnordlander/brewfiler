@@ -1,7 +1,10 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
-    <p><a href="{{ path('list_brews') }}">&laquo; Back</a></p>
+    <!-- As a heading -->
+    <nav class="navbar navbar-light bg-light">
+        <span class="navbar-brand mb-0 h1"><a href="{{ path('list_brews') }}">&laquo; Back</a></span>
+    </nav>
 
     <figure class="highcharts-figure">
         <div id="container"></div>
@@ -10,31 +13,31 @@
     <section class="landing">
         <div class="container">
             <div class="row">
-                <dl class="col">
-                    <dt>Date and Time</dt class="col">
+                <dl class="col-4 col-md-2">
+                    <dt>Date and Time</dt>
                     <dd>{{ brew.startTime|date('Y-m-d H:i', 'Europe/Stockholm') }}</dd>
                 </dl>
-                <dl class="col">
+                <dl class="col-4 col-md">
                     <dt>Total brew time</dt>
                     <dd>{{ brew.totalBrewTime|round(1) }} s</dd>
                 </dl>
-                <dl class="col">
+                <dl class="col-4 col-md">
                     <dt>Drip time</dt>
                     <dd>{{ brew.dripTime|round(1) }} s</dd>
                 </dl>
-                <dl class="col">
+                <dl class="col-4 col-md">
                     <dt>Drip flow</dt>
                     <dd>{{ brew.dripFlow|round(2) }} g/s</dd>
                 </dl>
-                <dl class="col">
+                <dl class="col-4 col-md">
                     <dt>Post stop flow</dt>
                     <dd>{{ brew.postStopFlow|round(2) }} g</dd>
                 </dl>
-                <dl class="col">
+                <dl class="col-4 col-md">
                     <dt>Target ratio</dt>
                     <dd>{% if brew.targetRatioDenominator %}1:{{ brew.targetRatioDenominator|round(2) }}{% else %}N/A{% endif %}</dd>
                 </dl>
-                <dl class="col">
+                <dl class="col-4 col-md">
                     <dt>Brewed ratio</dt>
                     <dd>{% if brew.finalRatioDenominator %}1:{{ brew.finalRatioDenominator|round(2) }}{% else %}N/A{% endif %}</dd>
                 </dl>
