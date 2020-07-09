@@ -8,7 +8,7 @@ use League\Csv\Reader;
 
 class Brew
 {
-    const DEFAULT_SIGMA = 0.1;
+    const DEFAULT_SIGMA = 0.5;
 
     /**
      * @var array
@@ -203,6 +203,17 @@ class Brew
         return null;
     }
 
+    public function firstDripTime(): ?\DateTimeInterface
+    {
+        $firstDrip = $this->getFirstDrip(self::DEFAULT_SIGMA);
+
+        if ($firstDrip) {
+            return $firstDrip->getTimestamp();
+        }
+
+        return null;
+    }
+
     private function getFirstDrip(float $sigma): ?BrewDataPoint
     {
         $prevPoint = null;
@@ -217,24 +228,39 @@ class Brew
         return null;
     }
 
+    public function lastDripTime(): ?\DateTimeInterface
+    {
+        $firstDrip = $this->getLastDrip(self::DEFAULT_SIGMA);
+
+        if ($firstDrip) {
+            return $firstDrip->getTimestamp();
+        }
+
+        return null;
+    }
+
     private function getLastDrip(float $sigma): ?BrewDataPoint
     {
+
         $prevPoint = null;
         $secPrevPoint = null;
         $thdPrevPoint = null;
 
         $firstDripFound = false;
 
+        $rollingAvg = 0;
+
         foreach ($this->datapoints as $datapoint) {
-            if ($prevPoint && $thdPrevPoint) {
-                $diff = $datapoint->getWeight() - $prevPoint->getWeight();
-                $thdDiff = $datapoint->getWeight() - $thdPrevPoint->getWeight();
+            if ($prevPoint instanceof BrewDataPoint && $secPrevPoint instanceof BrewDataPoint && $thdPrevPoint instanceof BrewDataPoint) {
+                $rollingAvg = ($datapoint->getWeight() + $prevPoint->getWeight() + $secPrevPoint->getWeight())/3;
+                $diff = $rollingAvg - $thdPrevPoint->getWeight();
+
                 if ($diff > $sigma) {
                     $firstDripFound = true;
                 }
 
-                if ($firstDripFound && $thdDiff < $sigma) {
-                    return $prevPoint;
+                if ($firstDripFound && $diff < $sigma) {
+                    return $thdPrevPoint;
                 }
             }
 

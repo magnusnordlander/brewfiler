@@ -64,11 +64,27 @@
                     color: '#6CF'
                 }],
         {% endif %}
-                plotLines: [{
-                    color: '#FF0000', // Red
-                    width: 2,
-                    value: new Date({{ (brew.stopTime|date('U.u' )* 1000)|round }}) // Position, you'll have to translate this to the values on your x axis
-                }]
+                plotLines: [
+                    {
+                        color: '#FF0000', // Red
+                        width: 2,
+                        value: new Date({{ (brew.stopTime|date('U.u' )* 1000)|round }}) // Position, you'll have to translate this to the values on your x axis
+                    },
+                    {% if brew.firstDripTime %}
+                    {
+                        color: '#00FF00', // Green
+                        width: 2,
+                        value: new Date({{ (brew.firstDripTime|date('U.u' )* 1000)|round }}) // Position, you'll have to translate this to the values on your x axis
+                    },
+                    {% endif %}
+                    {% if brew.lastDripTime %}
+                    {
+                        color: '#00FF00', // Green
+                        width: 2,
+                        value: new Date({{ (brew.lastDripTime|date('U.u' )* 1000)|round }}) // Position, you'll have to translate this to the values on your x axis
+                    },
+                    {% endif %}
+                ]
             },
             yAxis: [{
                 title: {
