@@ -31,11 +31,16 @@ class BrewfileController extends AbstractController
      * @param string $name
      * @Route("/", name="list_brews")
      */
-    public function listAction(): Response
+    public function listAction(Request $request): Response
     {
-        $brews = $this->repository->findAll();
+        $page = $request->query->get('page', 1);
 
-        return $this->render("list.html.twig", ['brews' => $brews]);
+        $perPage = 10;
+        $offset = ($page-1)*$perPage;
+
+        $brews = $this->repository->findAll($offset, $perPage);
+
+        return $this->render("list.html.twig", ['brews' => $brews, 'page' => $page]);
     }
 
     /**

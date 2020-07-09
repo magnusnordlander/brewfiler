@@ -19,14 +19,17 @@ class BrewRepository
         $this->brewDir = rtrim(realpath($brewDir), DIRECTORY_SEPARATOR);
     }
 
-    public function findAll(): array
+    public function findAll(int $offset = 0, int $limit = 15): array
     {
         $finder = new Finder();
         $finder->files()
             ->in($this->brewDir)
             ->name("brew_*.meta_v1.json")
             ->sortByName()
+            ->reverseSorting()
         ;
+
+        $finder = new \LimitIterator($finder->getIterator(), $offset, $limit);
 
         $brews = [];
         foreach($finder as $file) {

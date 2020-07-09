@@ -30,4 +30,8 @@
         {% endfor %}
         </tbody>
     </table>
+    {% if page > 1 %}
+        <a href="{{ path('list_brews', {'page': page - 1}) }}">&laquo; Previous page</a> |
+    {% endif %}
+    <a href="{{ path('list_brews', {'page': page + 1}) }}">Next page &raquo;</a>
 {% endblock %}
