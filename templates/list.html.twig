@@ -3,14 +3,15 @@
 {% block body %}
     <h1>Brews</h1>
 
-    <table>
+    <table class="table">
         <thead>
         <tr>
-            <th>Date</th>
-            <th>Extraction time</th>
-            <th>Coffee</th>
-            <th>Rating</th>
-            <th>Actions</th>
+            <th scope="col">Date</th>
+            <th scope="col">Extraction time</th>
+            <th scope="col">Coffee</th>
+            <th scope="col">Grind size</th>
+            <th scope="col">Rating</th>
+            <th scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -19,7 +20,8 @@
                 <td><a href="{{ path('show_brew', {'id': brew.id}) }}">{{ brew.startTime|date('Y-m-d H:i') }}</a></td>
                 <td>{{ brew.totalBrewTime|round(2) }} s</td>
                 <td>{{ brew.coffee }}</td>
-                <td>{{ brew.rating }}</td>
+                <td>{{ brew.grindSize }}</td>
+                <td>{{ brew.rating }} / 7</td>
                 <td>
                     <form action="{{ path('delete_brew', {'id': brew.id}) }}" method="POST">
                         <input type="hidden" name="_method" value="DELETE" />
