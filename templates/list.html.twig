@@ -3,10 +3,31 @@
 {% block body %}
     <h1>Brews</h1>
 
-    <ol>
+    <table>
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Extraction time</th>
+            <th>Coffee</th>
+            <th>Rating</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
         {% for brew in brews %}
-            <li><a href="{{ path('show_brew', {'id': brew.id}) }}">{{ brew.name }}</a></li>
+            <tr>
+                <td><a href="{{ path('show_brew', {'id': brew.id}) }}">{{ brew.startTime|date('Y-m-d H:i') }}</a></td>
+                <td>{{ brew.totalBrewTime|round(2) }} s</td>
+                <td>{{ brew.coffee }}</td>
+                <td>{{ brew.rating }}</td>
+                <td>
+                    <form action="{{ path('delete_brew', {'id': brew.id}) }}" method="POST">
+                        <input type="hidden" name="_method" value="DELETE" />
+                        <button type="button" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
         {% endfor %}
-
-    </ol>
+        </tbody>
+    </table>
 {% endblock %}

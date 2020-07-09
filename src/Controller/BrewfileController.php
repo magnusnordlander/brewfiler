@@ -10,6 +10,7 @@ use App\Repository\BrewRepository;
 use League\Csv\Reader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -39,7 +40,7 @@ class BrewfileController extends AbstractController
 
     /**
      * @param string $name
-     * @Route("/{id}", name="show_brew")
+     * @Route("/{id}", name="show_brew", methods={"GET"})
      */
     public function showAction(Request $request, string $id): Response
     {
@@ -57,5 +58,16 @@ class BrewfileController extends AbstractController
         }
 
         return $this->render("show.html.twig", ['brew' => $brew, 'form' => $form->createView()]);
+    }
+
+    /**
+     * @param string $name
+     * @Route("/{id}", name="delete_brew", methods={"DELETE"})
+     */
+    public function deleteAction(string $id): Response
+    {
+        $this->repository->delete($id);
+
+        return new RedirectResponse($this->generateUrl('list_brews'));
     }
 }

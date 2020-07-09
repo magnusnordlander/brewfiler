@@ -7,25 +7,42 @@
         <div id="container"></div>
     </figure>
 
+    <section class="landing">
+        <div class="container">
+            <div class="row">
+                <dl class="col">
+                    <dt>Date and Time</dt class="col">
+                    <dd>{{ brew.startTime|date('Y-m-d H:i', 'Europe/Stockholm') }}</dd>
+                </dl>
+                <dl class="col">
+                    <dt>Total brew time</dt>
+                    <dd>{{ brew.totalBrewTime|round(1) }} s</dd>
+                </dl>
+                <dl class="col">
+                    <dt>Drip time</dt>
+                    <dd>{{ brew.dripTime|round(1) }} s</dd>
+                </dl>
+                <dl class="col">
+                    <dt>Drip flow</dt>
+                    <dd>{{ brew.dripFlow|round(2) }} g/s</dd>
+                </dl>
+                <dl class="col">
+                    <dt>Post stop flow</dt>
+                    <dd>{{ brew.postStopFlow|round(2) }} g</dd>
+                </dl>
+                <dl class="col">
+                    <dt>Target ratio</dt>
+                    <dd>{% if brew.targetRatioDenominator %}1:{{ brew.targetRatioDenominator|round(2) }}{% else %}N/A{% endif %}</dd>
+                </dl>
+                <dl class="col">
+                    <dt>Brewed ratio</dt>
+                    <dd>{% if brew.finalRatioDenominator %}1:{{ brew.finalRatioDenominator|round(2) }}{% else %}N/A{% endif %}</dd>
+                </dl>
+            </div>
+        </div>
+    </section>
+
     {{ form(form) }}
-
-    <dl>
-        <dt>Date and Time</dt>
-        <dd> {{ brew.startTime|date('Y-m-d H:i', 'Europe/Stockholm') }}</dd>
-        <dt>Total brew time</dt>
-        <dd>{{ brew.totalBrewTime|round(1) }} s</dd>
-        <dt>Drip time</dt>
-        <dd>{{ brew.dripTime|round(1) }} s</dd>
-        <dt>Drip flow</dt>
-        <dd>{{ brew.dripFlow|round(2) }} g/s</dd>
-        <dt>Post stop flow</dt>
-        <dd>{{ brew.postStopFlow|round(2) }} g</dd>
-        <dt>Target ratio</dt>
-        <dd>{% if brew.targetRatioDenominator %}1:{{ brew.targetRatioDenominator|round(2) }}{% else %}N/A{% endif %}</dd>
-        <dt>Brewed ratio</dt>
-        <dd>{% if brew.finalRatioDenominator %}1:{{ brew.finalRatioDenominator|round(2) }}{% else %}N/A{% endif %}</dd>
-
-    </dl>
 
     <script>
         Highcharts.chart('container', {

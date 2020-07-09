@@ -62,4 +62,23 @@ class BrewRepository
             return null;
         }
     }
+
+    public function delete(string $id): void
+    {
+        $basePath = sprintf("%s/brew_%s", $this->brewDir, $id);
+        $metaFile = $basePath.".meta_v1.json";
+        $dataFile = $basePath.".brewfile_v1.csv";
+
+        if (file_exists($metaFile)) {
+            if (strpos(realpath($metaFile), $this->brewDir) === 0) {
+                unlink(realpath($metaFile));
+            }
+        }
+
+        if (file_exists($dataFile)) {
+            if (strpos(realpath($dataFile), $this->brewDir) !== 0) {
+                unlink(realpath($dataFile));
+            }
+        }
+    }
 }

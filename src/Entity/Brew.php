@@ -60,7 +60,6 @@ class Brew
             $name .= ": ".$this->getCoffee();
         }
 
-
         return $name;
     }
 
