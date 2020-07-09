@@ -21,7 +21,7 @@
                 <td>{{ brew.totalBrewTime|round(2) }} s</td>
                 <td>{{ brew.coffee }}</td>
                 <td>{{ brew.grindSize }}</td>
-                <td>{{ brew.rating }} / 7</td>
+                <td>{% if brew.rating %}{{ brew.rating }} / 7{% endif %}</td>
                 <td>
                     <form action="{{ path('delete_brew', {'id': brew.id}) }}" method="POST">
                         <input type="hidden" name="_method" value="DELETE" />
