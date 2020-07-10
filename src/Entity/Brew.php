@@ -163,15 +163,27 @@ class Brew
         return null;
     }
 
+    public function getTareWeight(float $sigma = self::DEFAULT_SIGMA): float
+    {
+        $firstDrip = $this->getFirstDrip($sigma, true);
+        if (!$firstDrip) {
+            return 0;
+        }
+
+        $tareWeight = $firstDrip->getWeight();
+
+        if ($tareWeight < self::DEFAULT_SIGMA && $tareWeight > -self::DEFAULT_SIGMA) {
+            return 0;
+        }
+
+        return $tareWeight;
+    }
+
     public function getFinalWeight(float $sigma = self::DEFAULT_SIGMA, bool $tare = true): ?float
     {
         $tareWeight = 0;
         if ($tare) {
-            $firstDrip = $this->getFirstDrip($sigma);
-            if (!$firstDrip) {
-                return null;
-            }
-            $tareWeight = $firstDrip->getWeight();
+            $tareWeight = $this->getTareWeight($sigma);
         }
 
         $lastDrip = $this->getLastDrip($sigma);
@@ -214,14 +226,19 @@ class Brew
         return null;
     }
 
-    private function getFirstDrip(float $sigma): ?BrewDataPoint
+    private function getFirstDrip(float $sigma, bool $tareDrip = false): ?BrewDataPoint
     {
         $prevPoint = null;
+        $secPrevPoint = null;
         foreach ($this->datapoints as $datapoint) {
             if ($prevPoint && $datapoint->getWeight() - $prevPoint->getWeight() > $sigma) {
+                if ($tareDrip && $secPrevPoint) {
+                    return $secPrevPoint;
+                }
                 return $prevPoint;
             }
 
+            $secPrevPoint = $prevPoint;
             $prevPoint = $datapoint;
         }
 

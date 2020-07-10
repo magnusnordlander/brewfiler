@@ -117,7 +117,7 @@
                     {% for datapoint in brew.datapoints %}
                     {
                         x: new Date({{ (datapoint.timestamp|date('U.u') * 1000)|round }}),
-                        y: {{ datapoint.weight }},
+                        y: {{ datapoint.weight - brew.tareWeight }},
                     },
                     {% endfor %}
                 ]
