@@ -118,6 +118,16 @@ class Brew
         return $this->meta['rating'] ?? null;
     }
 
+    public function setBasket(?string $basket)
+    {
+        $this->meta['basket'] = $basket;
+    }
+
+    public function getBasket(): ?string
+    {
+        return $this->meta['basket'] ?? null;
+    }
+
     public function getTotalBrewTime(): float
     {
         return $this->meta['stop_time'] - $this->meta['start_time'];
