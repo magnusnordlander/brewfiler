@@ -175,6 +175,8 @@ class Brew
 
     public function getTareWeight(float $sigma = self::DEFAULT_SIGMA): float
     {
+        return 0;
+
         $firstDrip = $this->getFirstDrip($sigma, true);
         if (!$firstDrip) {
             return 0;
