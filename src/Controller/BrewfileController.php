@@ -45,7 +45,7 @@ class BrewfileController extends AbstractController
 
     /**
      * @param string $name
-     * @Route("/{id}", name="show_brew", methods={"GET"})
+     * @Route("/{id}", name="show_brew", methods={"GET", "POST"})
      */
     public function showAction(Request $request, string $id): Response
     {
