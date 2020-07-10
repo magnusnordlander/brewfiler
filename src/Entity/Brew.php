@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\RingBuffer;
 use App\Time\PythonDateParser;
 use League\Csv\Reader;
 
 class Brew
 {
-    const DEFAULT_SIGMA = 0.5;
+    const DEFAULT_START_SIGMA = 0.3;
+    const DEFAULT_STOP_SIGMA = 0.2;
 
     /**
      * @var array
@@ -133,10 +135,10 @@ class Brew
         return $this->meta['stop_time'] - $this->meta['start_time'];
     }
 
-    public function getDripTime(float $sigma = self::DEFAULT_SIGMA): ?float
+    public function getDripTime(): ?float
     {
-        $firstDrip = $this->getFirstDrip($sigma);
-        $lastDrip = $this->getLastDrip($sigma);
+        $firstDrip = $this->getFirstDrip(self::DEFAULT_START_SIGMA);
+        $lastDrip = $this->getLastDrip(self::DEFAULT_STOP_SIGMA);
 
         if ($firstDrip && $lastDrip) {
             return $lastDrip->getRelativeTime() - $firstDrip->getRelativeTime();
@@ -145,10 +147,10 @@ class Brew
         return null;
     }
 
-    public function getDripFlow(float $sigma = self::DEFAULT_SIGMA): ?float
+    public function getDripFlow(): ?float
     {
-        $firstDrip = $this->getFirstDrip($sigma);
-        $lastDrip = $this->getLastDrip($sigma);
+        $firstDrip = $this->getFirstDrip(self::DEFAULT_START_SIGMA);
+        $lastDrip = $this->getLastDrip(self::DEFAULT_STOP_SIGMA);
 
         if ($firstDrip && $lastDrip) {
             $time = $lastDrip->getRelativeTime() - $firstDrip->getRelativeTime();
@@ -162,7 +164,7 @@ class Brew
         return null;
     }
 
-    public function getPostStopFlow(float $sigma = self::DEFAULT_SIGMA): ?float
+    public function getPostStopFlow(float $sigma = self::DEFAULT_STOP_SIGMA): ?float
     {
         $finalWeight = $this->getFinalWeight();
 
@@ -173,29 +175,27 @@ class Brew
         return null;
     }
 
-    public function getTareWeight(float $sigma = self::DEFAULT_SIGMA): float
+    private function getBaselineWeight(): float
     {
-        return 0;
+        $firstFive = array_slice($this->datapoints, 0, 5);
 
-        $firstDrip = $this->getFirstDrip($sigma, true);
-        if (!$firstDrip) {
+        if (count($firstFive) === 0) {
             return 0;
         }
 
-        $tareWeight = $firstDrip->getWeight();
-
-        if ($tareWeight < self::DEFAULT_SIGMA && $tareWeight > -self::DEFAULT_SIGMA) {
-            return 0;
-        }
-
-        return $tareWeight;
+        return array_sum(array_map(function(BrewDataPoint $point) { return $point->getWeight(); }, $firstFive)) / count($firstFive);
     }
 
-    public function getFinalWeight(float $sigma = self::DEFAULT_SIGMA, bool $tare = true): ?float
+    public function getTareWeight(float $sigma = self::DEFAULT_START_SIGMA): float
+    {
+        return $this->getBaselineWeight();
+    }
+
+    public function getFinalWeight(float $sigma = self::DEFAULT_STOP_SIGMA, bool $tare = true): ?float
     {
         $tareWeight = 0;
         if ($tare) {
-            $tareWeight = $this->getTareWeight($sigma);
+            $tareWeight = $this->getTareWeight(self::DEFAULT_START_SIGMA);
         }
 
         $lastDrip = $this->getLastDrip($sigma);
@@ -229,7 +229,7 @@ class Brew
 
     public function firstDripTime(): ?\DateTimeInterface
     {
-        $firstDrip = $this->getFirstDrip(self::DEFAULT_SIGMA);
+        $firstDrip = $this->getFirstDrip(self::DEFAULT_START_SIGMA);
 
         if ($firstDrip) {
             return $firstDrip->getTimestamp();
@@ -238,20 +238,18 @@ class Brew
         return null;
     }
 
-    private function getFirstDrip(float $sigma, bool $tareDrip = false): ?BrewDataPoint
+    private function getFirstDrip(float $sigma): ?BrewDataPoint
     {
-        $prevPoint = null;
-        $secPrevPoint = null;
+        $buffer = new RingBuffer(7);
+        $baseline = $this->getBaselineWeight();
         foreach ($this->datapoints as $datapoint) {
-            if ($prevPoint && $datapoint->getWeight() - $prevPoint->getWeight() > $sigma) {
-                if ($tareDrip && $secPrevPoint) {
-                    return $secPrevPoint;
-                }
-                return $prevPoint;
-            }
+            $buffer->add($datapoint);
 
-            $secPrevPoint = $prevPoint;
-            $prevPoint = $datapoint;
+            if ($buffer->avg(function(BrewDataPoint $point) { return $point->getWeight(); }) > $baseline + $sigma) {
+                $lastNotMatching = $buffer->lastNotMatching(function(BrewDataPoint $point) use ($baseline) { return $point->getWeight() > $baseline; });
+
+                return $lastNotMatching ?? $buffer->first();
+            }
         }
 
         return null;
@@ -259,7 +257,7 @@ class Brew
 
     public function lastDripTime(): ?\DateTimeInterface
     {
-        $firstDrip = $this->getLastDrip(self::DEFAULT_SIGMA);
+        $firstDrip = $this->getLastDrip(self::DEFAULT_STOP_SIGMA);
 
         if ($firstDrip) {
             return $firstDrip->getTimestamp();
@@ -284,11 +282,11 @@ class Brew
                 $rollingAvg = ($datapoint->getWeight() + $prevPoint->getWeight() + $secPrevPoint->getWeight())/3;
                 $diff = $rollingAvg - $thdPrevPoint->getWeight();
 
-                if ($diff > $sigma) {
+                if ($diff > self::DEFAULT_START_SIGMA) {
                     $firstDripFound = true;
                 }
 
-                if ($firstDripFound && $diff < $sigma) {
+                if ($firstDripFound && $diff < self::DEFAULT_STOP_SIGMA) {
                     return $thdPrevPoint;
                 }
             }
