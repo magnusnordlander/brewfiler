@@ -1,5 +1,19 @@
 {% extends "base.html.twig" %}
 
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function() {
+            $('.delete').click(function(evt) {
+                evt.stopPropagation();
+                $(this).siblings("input[type=submit]").show();
+                $(this).hide();
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block body %}
     <h1>Brews</h1>
 
@@ -25,7 +39,8 @@
                 <td class="d-none d-sm-table-cell">
                     <form action="{{ path('delete_brew', {'id': brew.id}) }}" method="POST">
                         <input type="hidden" name="_method" value="DELETE" />
-                        <input type="submit" class="btn btn-danger" value="Delete" />
+                        <button type="button" class="btn btn-warning delete">Delete</button>
+                        <input style="display:none;" type="submit" class="btn btn-danger" value="Confirm" />
                     </form>
                 </td>
             </tr>
