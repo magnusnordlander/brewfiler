@@ -132,7 +132,7 @@ class Brew
 
     public function getTotalBrewTime(): float
     {
-        return $this->meta['stop_time'] - $this->meta['start_time'];
+        return $this->getRelativeStopTime();
     }
 
     public function getDripTime(): ?float
@@ -173,6 +173,17 @@ class Brew
         }
 
         return null;
+    }
+
+    public function getPostStopTime(): ?float
+    {
+        $lastDrip = $this->getLastDrip();
+
+        if (!$lastDrip) {
+            return null;
+        }
+
+        return $lastDrip->getRelativeTime() - $this->getRelativeStopTime();
     }
 
     private function getBaselineWeight(): float
@@ -266,7 +277,7 @@ class Brew
         return null;
     }
 
-    private function getLastDrip(float $sigma): ?BrewDataPoint
+    private function getLastDrip(float $sigma = self::DEFAULT_STOP_SIGMA): ?BrewDataPoint
     {
 
         $prevPoint = null;
@@ -307,6 +318,11 @@ class Brew
     public function getStopTime(): \DateTimeInterface
     {
         return PythonDateParser::createDateTimeImmutable($this->meta['stop_time']);
+    }
+
+    private function getRelativeStopTime(): float
+    {
+        return $this->meta['stop_time'] - $this->meta['start_time'];
     }
 
     public function getPreinfusionUsed(): bool
@@ -353,5 +369,15 @@ class Brew
         }
 
         return false;
+    }
+
+    public function getStopWeight(): float
+    {
+        return $this->meta['stop_weight'];
+    }
+
+    public function getTargetWeight(): float
+    {
+        return $this->meta['target_weight'];
     }
 }

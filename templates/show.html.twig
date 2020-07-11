@@ -1,5 +1,15 @@
 {% extends "base.html.twig" %}
 
+{% block stylesheets %}
+{{ parent() }}
+
+    <style>
+        .landing {
+            margin-bottom: 15px;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
     <!-- As a heading -->
     <nav class="navbar navbar-light bg-light">
@@ -13,39 +23,71 @@
     <section class="landing">
         <div class="container">
             <div class="row">
-                <dl class="col-4 col-md-2">
+                <dl class="col-6 col-md-3">
                     <dt>Date and Time</dt>
                     <dd>{{ brew.startTime|date('Y-m-d H:i', 'Europe/Stockholm') }}</dd>
                 </dl>
-                <dl class="col-4 col-md">
+                <dl class="col-6 col-md-3">
                     <dt>Total brew time</dt>
                     <dd>{{ brew.totalBrewTime|round(1) }} s</dd>
                 </dl>
-                <dl class="col-4 col-md">
+                <dl class="col-6 col-md-3">
                     <dt>Drip time</dt>
                     <dd>{{ brew.dripTime|round(1) }} s</dd>
                 </dl>
-                <dl class="col-4 col-md">
+                <dl class="col-6 col-md-3">
                     <dt>Drip flow</dt>
                     <dd>{{ brew.dripFlow|round(2) }} g/s</dd>
                 </dl>
-                <dl class="col-4 col-md">
-                    <dt>Post stop flow</dt>
-                    <dd>{{ brew.postStopFlow|round(2) }} g</dd>
+                <dl class="col-6 col-md-3">
+                    <dt>Target weight</dt>
+                    <dd>{{ brew.targetWeight|round(2) }} g</dd>
                 </dl>
-                <dl class="col-4 col-md">
+                <dl class="col-6 col-md-3">
+                    <dt>Final weight</dt>
+                    <dd>{{ brew.finalWeight|round(2) }} g</dd>
+                </dl>
+                <dl class="col-6 col-md-3">
                     <dt>Target ratio</dt>
                     <dd>{% if brew.targetRatioDenominator %}1:{{ brew.targetRatioDenominator|round(2) }}{% else %}N/A{% endif %}</dd>
                 </dl>
-                <dl class="col-4 col-md">
+                <dl class="col-6 col-md-3">
                     <dt>Brewed ratio</dt>
                     <dd>{% if brew.finalRatioDenominator %}1:{{ brew.finalRatioDenominator|round(2) }}{% else %}N/A{% endif %}</dd>
                 </dl>
             </div>
+            <div class="row">
+                <button class="btn btn-sm btn-light" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    Brew algorithm analysis
+                </button>
+            </div>
+            <div class="row">
+                <div class="collapse" id="collapseExample">
+                    <div class="card card-body">
+                        <dl>
+                            <dt>Post stop flow</dt>
+                            <dd>{{ brew.postStopFlow|round(2) }} g</dd>
+                        </dl>
+                        <dl>
+                            <dt>Post stop time</dt>
+                            <dd>{{ brew.postStopTime|round(2) }} s</dd>
+                        </dl>
+                        <dl>
+                            <dt>Linear weight prediction .8s stop point</dt>
+                            <dd>{{ (brew.targetWeight - brew.dripFlow * 0.8)|round(2) }} g</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    {{ form(form) }}
+    <section>
+        <div class="container">
+            <h2>Parameters</h2>
+            {{ form(form) }}
+        </div>
+    </section>
 
     <script>
         Highcharts.chart('container', {
