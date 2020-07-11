@@ -25,7 +25,7 @@
                 <td class="d-none d-sm-table-cell">
                     <form action="{{ path('delete_brew', {'id': brew.id}) }}" method="POST">
                         <input type="hidden" name="_method" value="DELETE" />
-                        <button type="button" class="btn btn-danger">Delete</button>
+                        <input type="submit" class="btn btn-danger">Delete</input>
                     </form>
                 </td>
             </tr>
