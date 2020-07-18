@@ -21,9 +21,11 @@
         <thead>
         <tr>
             <th scope="col">Date</th>
-            <th scope="col">Extraction time</th>
+            <th scope="col">Time</th>
             <th scope="col">Coffee</th>
+            <th scope="col" class="d-none d-sm-table-cell">Preparation</th>
             <th scope="col" class="d-none d-sm-table-cell">Grind size</th>
+            <th scope="col" class="d-none d-sm-table-cell">Dose</th>
             <th scope="col" class="d-none d-sm-table-cell">Rating</th>
             <th scope="col" class="d-none d-sm-table-cell">Actions</th>
         </tr>
@@ -34,7 +36,9 @@
                 <td><a href="{{ path('show_brew', {'id': brew.id}) }}">{{ brew.startTime|date('Y-m-d H:i', 'Europe/Stockholm') }}</a></td>
                 <td>{{ brew.totalBrewTime|round(2) }} s</td>
                 <td>{{ brew.coffee }}</td>
+                <td class="d-none d-sm-table-cell">{{ brew.friendlyPreparation }}</td>
                 <td class="d-none d-sm-table-cell">{{ brew.grindSize }}</td>
+                <td class="d-none d-sm-table-cell">{% if brew.dose %}{{ brew.dose|round(1) }} g{% endif %}</td>
                 <td class="d-none d-sm-table-cell">{% if brew.rating %}{{ brew.rating }} / 7{% endif %}</td>
                 <td class="d-none d-sm-table-cell">
                     <form action="{{ path('delete_brew', {'id': brew.id}) }}" method="POST">

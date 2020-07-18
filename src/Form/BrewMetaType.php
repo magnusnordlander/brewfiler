@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Form;
 
+use App\Entity\Brew;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -28,6 +29,9 @@ class BrewMetaType extends AbstractType
             ]])
             ->add('grindSize', IntegerType::class, ['required' => false])
             ->add('dose', NumberType::class, ['required' => false])
+            ->add('preparation', ChoiceType::class, [
+                'choices' => array_merge(["" => null], array_flip(Brew::PREPARATION_TYPES)),
+            ])
             ->add('tastingNotes', TextareaType::class, ['required' => false])
             ->add('rating', IntegerType::class, ['required' => false])
             ->add('save', SubmitType::class)

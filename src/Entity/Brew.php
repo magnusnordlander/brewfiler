@@ -12,6 +12,17 @@ class Brew
     const DEFAULT_START_SIGMA = 0.3;
     const DEFAULT_STOP_SIGMA = 0.2;
 
+    const PREPARATION_TYPES = [
+        'espresso' => 'Espresso',
+        'espressomacchiato' => 'Espresso Macchiato',
+        'cappuccino' => 'Cappuccino',
+        'latte' => 'Caffè Latte',
+        'cortado' => 'Cortado',
+        'americano' => 'Americano',
+        'flatwhite' => 'Flat White',
+        'affogato' => 'Espresso Affogato',
+    ];
+
     /**
      * @var array
      */
@@ -128,6 +139,21 @@ class Brew
     public function getBasket(): ?string
     {
         return $this->meta['basket'] ?? null;
+    }
+
+    public function setPreparation(?string $preparationType)
+    {
+        $this->meta['preparation'] = $preparationType;
+    }
+
+    public function getPreparation(): ?string
+    {
+        return $this->meta['preparation'] ?? null;
+    }
+
+    public function getFriendlyPreparation(): ?string
+    {
+        return static::PREPARATION_TYPES[$this->getPreparation()] ?? null;
     }
 
     public function getTotalBrewTime(): float
